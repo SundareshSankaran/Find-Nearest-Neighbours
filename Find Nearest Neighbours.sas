@@ -72,6 +72,29 @@
 %mend _usr_getNameCaslib;
 
 /*-----------------------------------------------------------------------------------------*
+   This macro generates additional codepieces based on a condition provided.
+*------------------------------------------------------------------------------------------*/
+
+%macro _gac_generate_additional_code(conditionVar, conditionOperator, conditionVal, desiredVar, desiredVal);
+   %global _gac_generated_string;
+   %put &conditionVar. &conditionOperator. &conditionVal.;
+   %if &conditionVar. &conditionOperator. &conditionVal. %then %do; 
+      %put NOTE: Hey mama no shoes;
+      %let _gac_generated_string = &desiredVar.=&desiredVal.,;
+   %end;
+   %else %do;
+      %let _gac_generated_string = ;
+   %end;
+
+%mend;
+
+/*--------------------------------------------------------------------------------------*
+   Macro variable to hold the selected input columns to use as matching criteria.
+*---------------------------------------------------------------------------------------*/
+
+%let blankSeparatedCols = %_flw_get_column_list(_flw_prefix=inputColumns);
+
+/*-----------------------------------------------------------------------------------------*
    EXECUTION CODE MACRO 
 *------------------------------------------------------------------------------------------*/
 
@@ -173,6 +196,19 @@
 *------------------------------------------------------------------------------------------*/
 
       %if &_fnn_error_flag. = 0 %then %do;
+         
+         %local mTreesString;
+         %local maxPointsString;
+
+         %let desiredVar=mTrees;
+         %_gac_generate_additional_code(&searchMethod.,=,"APPROXIMATE",&desiredVar., &mTrees.);
+         %let mTreesString=&_gac_generated_string.;
+         %let _gac_generated_string=;
+
+         %let desiredVar=maxPoints;
+         %_gac_generate_additional_code(&searchMethod.,=,"APPROXIMATE",&desiredVar., &maxPoints.);
+         %let maxPointsString=&_gac_generated_string.;
+         %let _gac_generated_string=;
  
          proc cas;         
 
@@ -190,72 +226,42 @@
             outputDistTableLib  = symget("outputDistCaslib");
 
             idCol               = symget("idCol");
+            blankSeparatedCols  = symget("blankSeparatedCols");
             numMatches          = symget("numMatches");
             thresholdDistance   = symget("thresholdDistance");
             searchMethod        = symget("searchMethod");
+            mTreesString        = symget("mTreesString");
+            maxPointsString     = symget("maxPointsString");
             parallelization     = symget("parallelization");
 
-            mTrees              = symget("mTrees");
-            maxPoints           = symget("maxPoints");
 
 /*-----------------------------------------------------------------------------------------*
-   
+   Run Fast KNN action
 *------------------------------------------------------------------------------------------*/
    
-
+/*             fastknn.fastknn result=r /  */
+/*                table           = {name=inputTableName, caslib=inputTableLib}, */
+/*                query           = {name=queryTableName, caslib=queryTableLib}, */
+/*                inputs          = ${blankSeparatedCols}, */
+/*                id              = idCol, */
+/*                k               = numMatches, */
+/*                method          = searchMethod, */
+/*                &mTreesString. */
+/*                &maxPointsString. */
+/*                output          = { casout= {name=outputTableName, caslib=outputTableLib, replace=True}}, */
+/*                outDist         = { name=outputDistTableName, caslib=outputDistTableLib, replace=True}, */
+/*                parallelization = parallelization, */
+/*                threshDist      = thresholdDistance */
+/*             ; */
 
 /*-----------------------------------------------------------------------------------------*
-   Compile model.
+   Print summary results to output window;
 *------------------------------------------------------------------------------------------*/
- 
- 
-
-/*-----------------------------------------------------------------------------------------*
-   Score text to obtain sentences.
-*------------------------------------------------------------------------------------------*/
-
- 
-
-           
-/*-----------------------------------------------------------------------------------------*
-   Model validation is unlikely to error for a statically defined model, but good practice.
-*------------------------------------------------------------------------------------------*/
-
+       
+/*             print r; */
 
          quit;
 
-/*-----------------------------------------------------------------------------------------*
-   FUTURE PLACEHOLDER: The below step has potential for some refactoring with CASL 
-   in future. 
-   Fact result IDs, through a perhaps lovable quirk of the applyConcept action, are ordered
-   in descending order, giving a _result_id_ of 1 to the last occurrence of a sentence, 
-   rather than the first.  This data step corrects the same and also generates an overall
-   Observation ID which combines the original DocID and Sentence ID.
-*------------------------------------------------------------------------------------------*/
-         %if %sysfunc(upcase("&docId_1_type."))="NUMERIC" %then %do;
-            data &outputtable.;
-               length Obs_ID $40. total_sentences 8. ;
-               retain total_sentences;
-               set &outputtable.(rename=(_result_Id_=_sentence_id_) drop=_fact_argument_ _fact_ _path_);
-               by &docId. _start_ ;
-               if first.&docId. then do;
-                  total_sentences = _sentence_id_;
-               end;
-               Obs_ID = compress(put(&docId.,z10.)||"_"||put((sum(total_sentences,1)-_sentence_id_),z15.));               _sentence_id_ = sum(total_sentences,1)-_sentence_id_;
-            run;
-         %end;
-         %else %do;
-            data &outputtable.;
-               length Obs_ID $40. total_sentences 8. ;
-               retain total_sentences;
-               set &outputtable.(rename=(_result_Id_=_sentence_id_) drop=_fact_argument_ _fact_ _path_);
-               by &docId. _start_ ;        
-               if first.&docId. then do;
-                  total_sentences = _sentence_id_;
-               end;
-               Obs_ID = compress(substr(compress(&docId.),1,24)||"_"||put((sum(total_sentences,1)-_sentence_id_),z15.));
-            run;
-         %end;
       %end;
    %end;
 
@@ -279,6 +285,9 @@
 %symdel _usr_nameCaslib;
 %symdel inputCaslib;
 %symdel outputCaslib;
+%symdel _gac_generated_string;
+%symdel mTreesString;
+%symdel maxPointsString;
 
 %sysmacdelete _fnn_checkSession;
 %sysmacdelete _usr_getNameCaslib;
