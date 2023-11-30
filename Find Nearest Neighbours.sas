@@ -216,8 +216,8 @@
    Obtain inputs from UI.
 *------------------------------------------------------------------------------------------*/
 
-            inputTableName      = symget("inputTable_name_base");
-            inputTableLib       = symget("inputCaslib");
+            baseTableName      = symget("baseTable_name_base");
+            baseTableLib       = symget("baseCaslib");
             queryTableName      = symget("queryTable_name_base");
             queryTableLib       = symget("queryCaslib");
             outputTableName     = symget("outputTable_name_base");
@@ -226,39 +226,39 @@
             outputDistTableLib  = symget("outputDistCaslib");
 
             idCol               = symget("idCol");
-            blankSeparatedCols  = symget("blankSeparatedCols");
             numMatches          = symget("numMatches");
             thresholdDistance   = symget("thresholdDistance");
             searchMethod        = symget("searchMethod");
             mTreesString        = symget("mTreesString");
             maxPointsString     = symget("maxPointsString");
-            parallelization     = symget("parallelization");
 
 
 /*-----------------------------------------------------------------------------------------*
    Run Fast KNN action
+   Note:  We are currently keeping the default parallelization setting for the QUERY
+          table currently, due to the chances of some session hangups when running with
+          PARALLELIZATION=INPUT.  This is temporary and will be revisited.
 *------------------------------------------------------------------------------------------*/
    
-/*             fastknn.fastknn result=r /  */
-/*                table           = {name=inputTableName, caslib=inputTableLib}, */
-/*                query           = {name=queryTableName, caslib=queryTableLib}, */
-/*                inputs          = ${blankSeparatedCols}, */
-/*                id              = idCol, */
-/*                k               = numMatches, */
-/*                method          = searchMethod, */
-/*                &mTreesString. */
-/*                &maxPointsString. */
-/*                output          = { casout= {name=outputTableName, caslib=outputTableLib, replace=True}}, */
-/*                outDist         = { name=outputDistTableName, caslib=outputDistTableLib, replace=True}, */
-/*                parallelization = parallelization, */
-/*                threshDist      = thresholdDistance */
-/*             ; */
+            fastknn.fastknn result=r / 
+               table           = {name=baseTableName, caslib=baseTableLib},
+               query           = {name=queryTableName, caslib=queryTableLib},
+               inputs          = ${&blankSeparatedCols.},
+               id              = idCol,
+               k               = numMatches,
+               method          = searchMethod,
+               &mTreesString.
+               &maxPointsString.
+               output          = { casout= {name=outputTableName, caslib=outputTableLib, replace=True}},
+               outDist         = { name=outputDistTableName, caslib=outputDistTableLib, replace=True},
+               threshDist      = thresholdDistance
+            ;
 
 /*-----------------------------------------------------------------------------------------*
    Print summary results to output window;
 *------------------------------------------------------------------------------------------*/
        
-/*             print r; */
+            print r;
 
          quit;
 
@@ -272,23 +272,60 @@
    END MACRO DEFINITIONS.
 *------------------------------------------------------------------------------------------*/
 
+/*-----------------------------------------------------------------------------------------*
+   EXECUTION CODE
+   The execution code is controlled by the trigger variable defined in this custom step. This
+   trigger variable is in an "enabled" (value of 1) state by default, but in some cases, as 
+   dictated by logic, could be set to a "disabled" (value of 0) state.
+*------------------------------------------------------------------------------------------*/
+
+%if &_fnn_run_trigger. = 1 %then %do;
+   %_fnn_main_execution_code;
+%end;
+%if &_fnn_run_trigger. = 0 %then %do;
+   %put NOTE: This step has been disabled.  Nothing to do.;
+%end;
 
 
 
 /*-----------------------------------------------------------------------------------------*
    Clean up existing macro variables and macro definitions.
 *------------------------------------------------------------------------------------------*/
-%symdel _fnn_error_flag;
-%symdel _fnn_run_trigger;
-%symdel casSessionExists;
-%symdel _current_uuid_;
-%symdel _usr_nameCaslib;
-%symdel inputCaslib;
-%symdel outputCaslib;
-%symdel _gac_generated_string;
-%symdel mTreesString;
-%symdel maxPointsString;
+%if %symexist(_fnn_error_flag) %then %do;
+   %symdel _fnn_error_flag;
+%end;
+%if %symexist(outputDistCaslib) %then %do;
+   %symdel outputDistCaslib;
+%end;
+%if %symexist(queryCaslib) %then %do;
+   %symdel queryCaslib;
+%end;
+%if %symexist(baseCaslib) %then %do;
+   %symdel baseCaslib;
+%end;
+%if %symexist(_fnn_run_trigger) %then %do;
+   %symdel _fnn_run_trigger;
+%end;
+%if %symexist(casSessionExists) %then %do;
+   %symdel casSessionExists;
+%end;
+%if %symexist(_current_uuid_) %then %do;
+   %symdel _current_uuid_;
+%end;
+%if %symexist(_usr_nameCaslib) %then %do;
+   %symdel _usr_nameCaslib;
+%end;
+%if %symexist(outputCaslib) %then %do;
+   %symdel outputCaslib;
+%end;
+%if %symexist(_gac_generated_string) %then %do;
+   %symdel _gac_generated_string;
+%end;
+%if %symexist(blankSeparatedCols) %then %do;
+   %symdel blankSeparatedCols;
+%end;
 
 %sysmacdelete _fnn_checkSession;
 %sysmacdelete _usr_getNameCaslib;
 %sysmacdelete _fnn_main_execution_code;
+%sysmacdelete _gac_generate_additional_code;
