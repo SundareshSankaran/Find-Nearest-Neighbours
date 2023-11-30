@@ -18,7 +18,7 @@ Tested in Viya 4, Stable 2023.11
 
 ## Requirements
 
-1. A SAS Viya environment version 2023.11 or later
+1. A SAS Viya environment, version 2023.11 or later
 
 2. **At runtime: an active connection to CAS:** This custom step runs on data loaded to a SAS Cloud Analytics Services (CAS) library (known as a caslib). Ensure you are connected to CAS before running this step. 
 
@@ -31,7 +31,7 @@ Tested in Viya 4, Stable 2023.11
 
 1. Base table (input port, required): attach a CAS table to this port containing data to be searched against.
 
-2. Query table (input port, required): attach a CAS table to this port containing data for which you would like to search for nearest neighbors.
+2. Query table (input port, required): attach a CAS table to this port containing data for which you would like to search nearest neighbors.
 
 3. ID column (column selector, required): select a numeric column to serve as the unique identifier for each observation.
 
@@ -39,13 +39,13 @@ Tested in Viya 4, Stable 2023.11
 
 ### Settings
 
-1. Distance threshold (stepper, default 100): select a threshold which will act as the maximum limit to calculate distance and associate a pair of observations as neighbors.
+1. Distance threshold (stepper, default 100): select a threshold which will act as the maximum limit to calculate distance.
 
 2. Search Method (drop-down list,  default is Approximate): select whether to use the Exact or Approximate search method.  Refer documentation for details.
 
 3. Number of binary trees (stepper, upon selection of Approximate search method, default 10):  select the number of adjacent binary trees to which the search method will confine its search to.
 
-4. Number of points (stepper, upon selection of Approximate search method, default 100):  select maximum number of points to evaluate in a lead node.
+4. Maximum number of points (stepper, upon selection of Approximate search method, default 100):  select maximum number of points to evaluate in a leaf node.
 
 5. Parallelization method (set to current default of Query, not modifiable in this version):  this setting specifies whether the query table or the base table will be parallelized while conducting the search.  We have set this to the default value of Query for this initial version of the step and will explore providing the Input (base table) option in a future version.
 
@@ -92,7 +92,7 @@ To "enable" this step again, run the following (it's assumed that this has alrea
 
 1. [The fastknn.fastknn Cloud Analytics Service (CAS) action](https://go.documentation.sas.com/doc/en/pgmsascdc/default/casactml/cas-fastknn-fastknn.htm)
 
-2. [Useful SAS Communities article on the K-Nearest Neighbors algorithm](https://communities.sas.com/t5/SAS-Communities-Library/A-Simple-Introduction-to-K-Nearest-Neighbors-Algorithm/ta-p/565402)
+2. [Useful SAS Communities article on the K-Nearest Neighbors algorithm](http://communities.sas.com/t5/SAS-Communities-Library/A-Simple-Introduction-to-K-Nearest-Neighbors-Algorithm/ta-p/565402)
 
 3. [Details on the optional run-time trigger control](https://communities.sas.com/t5/SAS-Communities-Library/Switch-on-switch-off-run-time-control-of-SAS-Studio-Custom-Steps/ta-p/885526)
 
