@@ -2,16 +2,19 @@
 
 The Find Nearest Neighbors Custom Step searches a base table to identify nearest neighbors to observations in an input query table, based on a distance formula.
 
-This step facilitates  applications in recommendation engines, similarity analysis, and search.  With the increased focus on generative AI today, this step can be used to match embeddings and enhance semantic search and large language models.
+This step facilitates  applications in recommendation engines, similarity analysis, search and others.  With an increased focus on generative AI, this step can be used to match embeddings to find similar documents and augment semantic search and large language models.
 
-This custom step makes use of the fastknn.fastknn action.
+This custom step makes use of the fastknn.fastknn SAS Cloud Analytics Services (CAS) action.
+
 
 ## A general idea
 
 ![A general idea](/img/Find%20Nearest%20Neighbors.png)
 
+
 ## SAS Viya Version Support
 Tested in Viya 4, Stable 2023.11
+
 
 ## Requirements
 
@@ -20,6 +23,7 @@ Tested in Viya 4, Stable 2023.11
 2. **At runtime: an active connection to CAS:** This custom step runs on data loaded to a SAS Cloud Analytics Services (CAS) library (known as a caslib). Ensure you are connected to CAS before running this step. 
 
 3. This custom step requires a license for SAS Viya or higher to be able to run the fastknn.fastknn action.
+
 
 ## User Interface
 
@@ -53,6 +57,7 @@ Tested in Viya 4, Stable 2023.11
 
 3. Output Distance table (output port, required): attach a CAS table to this port.  This will hold a long dataset containing the ID from the query table, the neighbor ID from the base table and the Euclidean distance measure.
 
+
 ## Run Time Control
 
 This is optional.  In some scenarios, you may wish to dynamically control whether this custom step runs or simply "passes through" without doing anything, in a SAS Studio session. The following macro variable is set to initialize with a value of 1 by default, indicating an "enabled" status and allowing the custom step to run.
@@ -82,6 +87,7 @@ To "enable" this step again, run the following (it's assumed that this has alrea
 
 **Important:** Be aware that disabling this step means that none of its main execution code will run, and any  downstream code which was dependent on this code may fail.  Change this setting only if it aligns with the objective of your SAS Studio program.
 
+
 ## Documentation
 
 1. [The fastknn.fastknn Cloud Analytics Service (CAS) action](https://go.documentation.sas.com/doc/en/pgmsascdc/default/casactml/cas-fastknn-fastknn.htm)
@@ -90,12 +96,15 @@ To "enable" this step again, run the following (it's assumed that this has alrea
 
 3. [Details on the optional run-time trigger control](https://communities.sas.com/t5/SAS-Communities-Library/Switch-on-switch-off-run-time-control-of-SAS-Studio-Custom-Steps/ta-p/885526)
 
+
 ## Installation & Usage
 - Refer to the [steps listed here](https://github.com/sassoftware/sas-studio-custom-steps#getting-started---making-a-custom-step-from-this-repository-available-in-sas-studio).
+
 
 ## Created / contact : 
 
 - Sundaresh Sankaran (sundaresh.sankaran@sas.com)
+
 
 ## Change Log
 
