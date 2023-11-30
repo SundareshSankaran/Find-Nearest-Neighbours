@@ -25,7 +25,7 @@ Tested in Viya 4, Stable 2023.11
 
 ### Input Parameters
 
-1.Base table (input port, required): attach a CAS table to this port containing data to be searched against.
+1. Base table (input port, required): attach a CAS table to this port containing data to be searched against.
 
 2. Query table (input port, required): attach a CAS table to this port containing data for which you would like to search for nearest neighbors.
 
