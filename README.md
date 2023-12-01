@@ -1,4 +1,4 @@
-# Find Nearest Neighbours
+# Find Nearest Neighbors
 
 The Find Nearest Neighbors Custom Step searches a base table to identify nearest neighbors to observations in an input query table, based on a distance formula.
 
@@ -9,7 +9,7 @@ This custom step makes use of the fastknn.fastknn SAS Cloud Analytics Services (
 
 ## A general idea
 
-![A general idea](/img/Find%20Nearest%20Neighbors.png)
+![A general idea](./img/Find%20Nearest%20Neighbors.png)
 
 
 ## SAS Viya Version Support
@@ -95,6 +95,9 @@ To "enable" this step again, run the following (it's assumed that this has alrea
 2. [Useful SAS Communities article on the K-Nearest Neighbors algorithm](http://communities.sas.com/t5/SAS-Communities-Library/A-Simple-Introduction-to-K-Nearest-Neighbors-Algorithm/ta-p/565402)
 
 3. [Details on the optional run-time trigger control](https://communities.sas.com/t5/SAS-Communities-Library/Switch-on-switch-off-run-time-control-of-SAS-Studio-Custom-Steps/ta-p/885526)
+
+## SAS Program
+Refer [here](./extras/Find%20Nearest%20Neighbours.sas) for the SAS program used by the step.  You'd find this useful for situations where you wish to execute this step through non-SAS Studio Custom Step interfaces such as the [SAS Extension for Visual Studio Code](https://github.com/sassoftware/vscode-sas-extension), with minor modifications. 
 
 
 ## Installation & Usage
